@@ -35,7 +35,7 @@ favicon:
         - 192x192
         - 96x96
         - 48x48
-  classic:
+  generic:
     sizes:
       - 16x16
       - 32x32

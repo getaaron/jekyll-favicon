@@ -9,8 +9,8 @@ describe Jekyll::Favicon do
     refute_empty Jekyll::Favicon.config
     refute_empty Jekyll::Favicon.config['source']
     refute_empty Jekyll::Favicon.config['path']
-    refute_empty Jekyll::Favicon.config['classic']
-    refute_empty Jekyll::Favicon.config['classic']['sizes']
+    refute_empty Jekyll::Favicon.config['generic']
+    refute_empty Jekyll::Favicon.config['generic']['sizes']
     refute_empty Jekyll::Favicon.config['apple-touch-icon']
     refute_empty Jekyll::Favicon.config['apple-touch-icon']['background']
     refute_empty Jekyll::Favicon.config['apple-touch-icon']['sizes']

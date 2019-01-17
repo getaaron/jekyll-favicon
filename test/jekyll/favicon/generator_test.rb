@@ -45,7 +45,7 @@ describe Jekyll::Favicon::Generator do
 
     it 'should create PNG favicons' do
       generated_files = Dir.glob File.join(@destination, '**', '*.png')
-      options = ['classic', 'ie', 'chrome', 'apple-touch-icon']
+      options = ['generic', 'ie', 'chrome', 'apple-touch-icon']
       sizes = options.collect { |option| option['sizes'] }.compact.uniq
       sizes.each do |size|
         icon = File.join @destination, @defaults['path'], "favicon-#{size}.png"
@@ -80,7 +80,7 @@ describe Jekyll::Favicon::Generator do
 
     it 'should create PNG favicons' do
       generated_files = Dir.glob File.join(@destination, '**', '*.png')
-      options = ['classic', 'ie', 'chrome', 'apple-touch-icon']
+      options = ['generic', 'ie', 'chrome', 'apple-touch-icon']
       sizes = options.collect { |option| option['sizes'] }.compact.uniq
       sizes.each do |size|
         icon = File.join @destination, @defaults['path'], "favicon-#{size}.png"
