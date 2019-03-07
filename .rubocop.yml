@@ -3,3 +3,5 @@ Metrics/BlockLength:
     - Rakefile
     - '**/*.rake'
     - test/**/*.rb
+Style/AndOr:
+  EnforcedStyle: conditionals

@@ -1,0 +1,24 @@
+favicon:
+  defaults:
+    processing:
+      defaults: &defaults
+        background: white
+        define: null
+        density: null
+        alpha: Transparent
+        gravity: Center
+      input:
+        .svg:
+          <<: *defaults
+          density: 2000
+        .png:
+          <<: *defaults
+      output:
+        .svg:
+          <<: *defaults
+        .ico:
+          <<: *defaults
+          alpha: Remove
+          gravity: center
+        .png:
+          <<: *defaults

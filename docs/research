@@ -1,0 +1,69 @@
+Safari macOS: classic png largest to smallest then ico. Bookmark calls touch-icon-iphone-retina.png twice
+
+First time
+GET /index.html
+GET /classic-192x192.png
+GET /classic-64x64.png
+GET /classic-32x32.png
+GET /classic-16x16.png
+GET /classic.ico
+Add Bookmark
+GET /index.html
+GET /touch-icon-iphone-retina.png
+GET /index.html
+GET /touch-icon-iphone-retina.png
+Reload after add bookmark
+GET /index.html
+GET /touch-icon-iphone-retina.png
+GET /index.html
+GET /index.html
+GET /touch-icon-iphone-retina.png
+GET /index.html
+GET /touch-icon-iphone-retina.png
+Close and open from bookmark
+GET /index.html
+GET /touch-icon-iphone-retina.png
+GET /classic-192x192.png
+GET /classic-64x64.png
+GET /classic-32x32.png
+GET /classic-16x16.png
+GET /classic.ico
+GET /safari-pinned-tab.svg
+
+
+Safari iOS:
+
+First time:
+GET /index.html
+GET /classic-192x192.png
+GET /classic.ico
+GET /classic-64x64.png
+GET /classic-32x32.png
+GET /classic-16x16.png
+Press share button:
+GET /manifest.json
+Press Add bookmark
+GET /manifest.json
+GET /index.html
+GET /apple-touch-icon-120x120-precomposed.png
+GET /apple-touch-icon-120x120.png
+GET /touch-icon-iphone-retina.png
+Close and reopen from bookmark
+GET /index.html
+GET /apple-touch-icon-120x120-precomposed.png
+GET /apple-touch-icon-120x120.png
+GET /touch-icon-iphone-retina.png
+Share then Add to home screen
+GET /touch-icon-ipad.png
+
+Safari iPad
+
+Add to home screen
+	GET /touch-icon-ipad.png
+Add bookmark
+	GET /index.html
+GET /apple-touch-icon-152x152-precomposed.png
+GET /apple-touch-icon-152x152.png
+GET /touch-icon-iphone-retina.png
+
+Chrome classic in order

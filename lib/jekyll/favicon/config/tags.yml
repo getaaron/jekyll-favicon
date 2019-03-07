@@ -1,0 +1,43 @@
+favicon:
+  defaults:
+    tags:
+      link:
+        .ico:
+          crossorigin: null
+          href: null
+          hreflang: null
+          media: null
+          rel: icon
+          sizes: null
+          type: image/x-icon
+        .png:
+          crossorigin: null
+          href: null
+          hreflang: null
+          media: null
+          rel: icon
+          sizes: true
+          type: image/png
+        .svg:
+          crossorigin: null
+          href: null
+          hreflang: null
+          media: null
+          rel: icon
+          sizes: any
+          type: image/svg+xml
+        .webmanifest: &manifest
+          crossorigin: null
+          href: null
+          hreflang: null
+          media: null
+          rel: manifest
+          sizes: null
+          type: null
+        .json:
+          <<: *manifest
+      meta:
+        charset: null
+        content: null
+        http-equiv: null
+        name: null

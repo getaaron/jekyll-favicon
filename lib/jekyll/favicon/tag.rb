@@ -9,15 +9,11 @@ module Jekyll
 
       def render(context)
         site = context.registers[:site]
-        prepend_path = site.baseurl || ''
-        templates_dir = Favicon.templates
-        head = "<!-- Begin Jekyll Favicon tag v#{Favicon::VERSION} -->"
-        body = %w[generic safari chrome ie].collect do |template|
-          template_path = File.join templates_dir, "#{template}.html.erb"
-          ERB.new(File.read(template_path), nil, '-').result(binding).strip
-        end
-        foot = '<!-- End Jekyll Favicon tag -->'
-        [head, body.join("\n"), foot].join("\n")
+        content = []
+        content << "<!-- Begin Jekyll Favicon tag v#{Favicon::VERSION} -->"
+        content << Favicon.tags(site)
+        content << '<!-- End Jekyll Favicon tag -->'
+        content.flatten.join "\n"
       end
     end
   end

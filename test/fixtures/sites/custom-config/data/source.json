@@ -1,5 +1,5 @@
 {
-  "name": "target.webmanifest",
+  "name": "custom.webmanifest name",
   "short_name": "target",
   "start_url": ".",
   "display": "standalone",

@@ -1,9 +1,12 @@
 favicon:
-  chrome:
-    manifest:
+  source: 'custom-favicon.svg'
+  path: 'custom/path'
+  resources:
+    manifest.webmanifest: skip
+    custom.webmanifest:
+      path: assets/markups
       source: data/source.json
-      target: data/target.webmanifest
-  ie:
-    browserconfig:
+    browserconfig.xml: skip
+    custom.xml:
+      path: assets/objects
       source: data/source.xml
-      target: data/browserconfig.xml

@@ -1,11 +1,8 @@
 require 'test_helper'
-require 'nokogiri'
 
 describe Jekyll::Favicon::Tag do
   before :all do
-    @options = {
-      'destination' => Dir.mktmpdir
-    }
+    @options = { 'destination' => Dir.mktmpdir }
   end
 
   after :all do
@@ -15,66 +12,78 @@ describe Jekyll::Favicon::Tag do
   describe 'using minimal configuration' do
     before :all do
       @options['source'] = fixture 'sites', 'minimal'
-      @config = Jekyll.configuration @options
-      @site = Jekyll::Site.new @config
+      jekyll_config = Jekyll.configuration @options
+      @site = Jekyll::Site.new jekyll_config
       @site.process
-      @destination = @options['destination']
-      index_destination = File.join(@destination, 'index.html')
-      @index_document = Nokogiri::Slop File.open(index_destination)
-      @site_baseurl = @site.baseurl || ''
+      index_path = File.join @site.dest, 'index.html'
+      @index = Nokogiri::Slop File.open index_path
     end
 
-    it 'should generate ico link' do
-      ico_config = Jekyll::Favicon.config['ico']
-      ico_path = File.join @site_baseurl, ico_config['target']
-      css_selector = 'link[href="' + ico_path + '"]'
-      assert @index_document.at_css(css_selector)
+    it 'should generate shortcut and icon link' do
+      @index.at_css('link[rel="shortcut icon"]').wont_be_nil
+      @index.at_css('link[rel="icon"]').wont_be_nil
     end
 
     it 'should generate webmanifest link' do
-      webmanifest_config = Jekyll::Favicon.config['chrome']['manifest']
-      webmanifest_path = File.join File.join @site_baseurl,
-                                             webmanifest_config['target']
-      css_selector = 'link[href="' + webmanifest_path + '"]'
-      assert @index_document.at_css(css_selector)
+      resource = Jekyll::Favicon.resource @site, 'manifest.webmanifest'
+      css_selector = 'link[href="' + resource.endpoint + '"]'
+      @index.css(css_selector).wont_be_nil
     end
 
-    it 'should generate browserconfig link' do
-      browserconfig_config = Jekyll::Favicon.config['ie']['browserconfig']
-      browserconfig_path = File.join File.join @site_baseurl,
-                                               browserconfig_config['target']
-      css_selector = 'meta[content="' + browserconfig_path + '"]'
-      assert @index_document.at_css(css_selector)
+    it 'should generate browserconfig meta' do
+      resource = Jekyll::Favicon.resource @site, 'browserconfig.xml'
+      css_selector = 'meta[content="' + resource.endpoint + '"]'
+      @index.css(css_selector).wont_be_nil
+    end
+
+    it 'should generate metas' do
+      resource = Jekyll::Favicon.resource @site, 'favicon-144x144.png'
+      resource.tags.each do |tag|
+        css_selector = 'meta[content="' + tag.content + '"]'
+        @index.css(css_selector).wont_be_nil
+      end
     end
 
     it 'should include safari pinned tag' do
-      pinned_path = File.join @site_baseurl,
-                              Jekyll::Favicon.config['path'],
-                              'safari-pinned-tab.svg'
-      css_selector = 'link[ rel="mask-icon"][href="' + pinned_path + '"]'
-      assert @index_document.at_css(css_selector)
-      assert pinned_path, @index_document.css(css_selector).attribute('href')
+      resource = Jekyll::Favicon.resource @site, 'safari-pinned-tab.svg'
+      css_selector = 'link[ rel="mask-icon"][href="' + resource.endpoint + '"]'
+      link = @index.css css_selector
+      link.wont_be_nil
+      link.attribute('href').value.must_equal resource.endpoint
     end
   end
 
   describe 'when site uses default PNG favicon' do
     before :all do
       @options['source'] = fixture 'sites', 'minimal-png-source'
-      @config = Jekyll.configuration @options
-      @site = Jekyll::Site.new @config
+      jekyll_config = Jekyll.configuration @options
+      @site = Jekyll::Site.new jekyll_config
       @site.process
-      @destination = @options['destination']
-      index_destination = File.join(@destination, 'index.html')
-      @index_document = Nokogiri::Slop File.open(index_destination)
-      @site_baseurl = @site.baseurl || ''
+      index_path = File.join @site.dest, 'index.html'
+      @index = Nokogiri::Slop File.open index_path
     end
 
     it 'should skip safari pinned tag' do
-      pinned_path = File.join @site_baseurl,
-                              Jekyll::Favicon.config['path'],
-                              'safari-pinned-tab.svg'
-      css_selector = 'link[ rel="mask-icon"][href="' + pinned_path + '"]'
-      refute @index_document.at_css(css_selector)
+      resource = Jekyll::Favicon.resource @site, 'safari-pinned-tab.svg'
+      css_selector = 'link[ rel="mask-icon"][href="' + resource.endpoint + '"]'
+      refute @index.at_css(css_selector)
+    end
+  end
+
+  describe 'when site uses default custom configuration' do
+    before :all do
+      @options['source'] = fixture 'sites', 'custom-config'
+      jekyll_config = Jekyll.configuration @options
+      @site = Jekyll::Site.new jekyll_config
+      @site.process
+      index_path = File.join @site.dest, 'index.html'
+      @index = Nokogiri::Slop File.open index_path
+    end
+
+    it 'should generate ico link with custom path' do
+      resource = Jekyll::Favicon.resource @site, 'favicon.ico'
+      css_selector = 'link[href="' + resource.endpoint + '"]'
+      @index.css(css_selector).wont_be_nil
     end
   end
 end

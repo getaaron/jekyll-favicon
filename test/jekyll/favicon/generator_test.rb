@@ -1,11 +1,11 @@
 require 'test_helper'
-require 'rexml/document'
 
 describe Jekyll::Favicon::Generator do
   before :all do
     @options = {
       'destination' => Dir.mktmpdir
     }
+    @destination = @options['destination']
   end
 
   after :all do
@@ -35,8 +35,7 @@ describe Jekyll::Favicon::Generator do
       @config = Jekyll.configuration @options
       @site = Jekyll::Site.new @config
       @site.process
-      @destination = @options['destination']
-      @defaults = Jekyll::Favicon::DEFAULTS
+      @config = Jekyll::Favicon::CONFIG
     end
 
     it 'should create ICO favicon' do
@@ -48,19 +47,19 @@ describe Jekyll::Favicon::Generator do
       options = ['generic', 'ie', 'chrome', 'apple-touch-icon']
       sizes = options.collect { |option| option['sizes'] }.compact.uniq
       sizes.each do |size|
-        icon = File.join @destination, @defaults['path'], "favicon-#{size}.png"
-        assert_includes generated_files, icon
+        icon = File.join @destination, @config['path'], "favicon-#{size}.png"
+        generated_files.must_include icon
       end
     end
 
     it 'should create a webmanifest' do
-      assert File.exist? File.join @destination,
-                                   @defaults['chrome']['manifest']['target']
+      resource = Jekyll::Favicon.resource @site, 'manifest.webmanifest'
+      assert File.exist? File.join @destination, resource.endpoint
     end
 
     it 'should create a browserconfig' do
-      assert File.exist? File.join @destination,
-                                   @defaults['ie']['browserconfig']['target']
+      resource = Jekyll::Favicon.resource @site, 'browserconfig.xml'
+      assert File.exist? File.join @destination, resource.endpoint
     end
   end
 
@@ -70,8 +69,7 @@ describe Jekyll::Favicon::Generator do
       @config = Jekyll.configuration @options
       @site = Jekyll::Site.new @config
       @site.process
-      @destination = @options['destination']
-      @defaults = Jekyll::Favicon::DEFAULTS
+      @config = Jekyll::Favicon::CONFIG
     end
 
     it 'should create ICO favicon' do
@@ -83,19 +81,19 @@ describe Jekyll::Favicon::Generator do
       options = ['generic', 'ie', 'chrome', 'apple-touch-icon']
       sizes = options.collect { |option| option['sizes'] }.compact.uniq
       sizes.each do |size|
-        icon = File.join @destination, @defaults['path'], "favicon-#{size}.png"
-        assert_includes generated_files, icon
+        icon = File.join @destination, @config['path'], "favicon-#{size}.png"
+        generated_files.must_include icon
       end
     end
 
     it 'should create a webmanifest' do
-      assert File.exist? File.join @destination,
-                                   @defaults['chrome']['manifest']['target']
+      resource = Jekyll::Favicon.resource @site, 'manifest.webmanifest'
+      assert File.exist? File.join @destination, resource.endpoint
     end
 
     it 'should create a browserconfig' do
-      assert File.exist? File.join @destination,
-                                   @defaults['ie']['browserconfig']['target']
+      resource = Jekyll::Favicon.resource @site, 'browserconfig.xml'
+      assert File.exist? File.join @destination, resource.endpoint
     end
   end
 
@@ -105,20 +103,22 @@ describe Jekyll::Favicon::Generator do
       @config = Jekyll.configuration @options
       @site = Jekyll::Site.new @config
       @site.process
-      @destination = @options['destination']
-      @defaults = Jekyll::Favicon::DEFAULTS
-      webmanifest_path = File.join @destination,
-                                   @defaults['chrome']['manifest']['target']
-      webmanifest_content = File.read webmanifest_path
+      @config = Jekyll::Favicon::CONFIG
+      resource = Jekyll::Favicon.resource @site, 'manifest.webmanifest'
+      webmanifest_content = File.read File.join @destination, resource.endpoint
       @webmanifest = JSON.parse webmanifest_content
     end
 
     it 'should keep values from existent webmanifest' do
-      assert @webmanifest.keys.include?('name')
+      @webmanifest.keys.must_include 'name'
+      @webmanifest.keys.must_include 'short_name'
     end
 
     it 'should append icons webmanifest' do
-      assert @webmanifest.keys.include?('icons')
+      @webmanifest.keys.must_include 'icons'
+      @webmanifest['icons'].wont_be_empty
+      # p @webmanifest['icons']
+      @webmanifest['icons'].size.must_equal 2
     end
   end
 
@@ -131,48 +131,42 @@ describe Jekyll::Favicon::Generator do
       @custom_config = YAML.load_file File.join @options['source'],
                                                 '_config.yml'
       @custom_favicon_config = @custom_config['favicon']
-      @webmanifest_config = @custom_favicon_config['chrome']['manifest']
-      @browserconfig_config = @custom_favicon_config['ie']['browserconfig']
+      @webmanifest = Jekyll::Favicon.resource @site, 'custom.webmanifest'
+      @browserconfig = Jekyll::Favicon.resource @site, 'custom.xml'
     end
 
     it 'should exists only one manifest' do
-      source_webmanifest_path = File.join @options['destination'],
-                                          @webmanifest_config['source']
-      refute File.file? source_webmanifest_path
-      target_webmanifest_path = File.join @options['destination'],
-                                          @webmanifest_config['target']
-      assert File.file? File.join target_webmanifest_path
+      refute File.file? File.join @destination, @webmanifest.source
+      assert File.file? File.join @destination, @webmanifest.endpoint
     end
 
     it 'should merge attributes from existent webmanifest' do
-      target_webmanifest_path = File.join @options['destination'],
-                                          @webmanifest_config['target']
-      webmanifest = JSON.parse File.read target_webmanifest_path
-      assert_includes webmanifest.keys, 'icons'
-      assert_includes webmanifest.keys, 'name'
-      assert_equal webmanifest['name'], 'target.webmanifest'
+      endpoint = File.join @destination, @webmanifest.endpoint
+      assert File.file? endpoint
+      webmanifest = JSON.parse File.read endpoint
+      webmanifest.keys.must_include 'icons'
+      webmanifest.keys.must_include 'name'
+      webmanifest['name'].must_equal 'custom.webmanifest name'
     end
 
     it 'should exists only one browserconfig' do
-      source_browserconfig_path = File.join @options['destination'],
-                                            @browserconfig_config['source']
-      refute File.file? source_browserconfig_path
-      target_browserconfig_path = File.join @options['destination'],
-                                            @browserconfig_config['target']
-      assert File.file? File.join target_browserconfig_path
+      refute File.file? File.join @destination, @browserconfig.source
+      assert File.file? File.join @destination, @browserconfig.endpoint
     end
 
-    it 'should merge and override attributes from existent webmanifest' do
-      target_browserconfig_path = File.join @options['destination'],
-                                            @browserconfig_config['target']
-      browserconfig = REXML::Document.new File.read target_browserconfig_path
+    it 'should merge and override attributes from existent browserconfig' do
+      endpoint = File.join @destination, @browserconfig.endpoint
+      assert File.file? endpoint
+      browserconfig = REXML::Document.new File.read endpoint
       msapplication = browserconfig.elements['/browserconfig/msapplication']
+      msapplication.wont_be_nil
       tiles = msapplication.elements['tile']
-      assert_equal 1, tiles.get_elements('square70x70logo').size
-      assert_equal 1, tiles.get_elements('TileColor').size
-      assert_equal '/assets/images/favicon-128x128.png',
-                   tiles.elements['square70x70logo'].attributes['src']
-      assert msapplication.elements['notification'].has_elements?
+      tiles.get_elements('square70x70logo').size.must_equal 1
+      tiles.get_elements('TileColor').size.must_equal 1
+      endpoint = File.join '', @custom_favicon_config['path'],
+                           'favicon-128x128.png'
+      tiles.elements['square70x70logo'].attributes['src'].must_equal endpoint
+      msapplication.elements['notification'].wont_be_nil
     end
   end
 end

@@ -1,0 +1,121 @@
+favicon:
+  source: favicon.svg
+  path: ''
+  resources:
+    favicon.ico:
+      sizes:
+        - 64x64
+        - 48x48
+        - 32x32
+        - 24x24
+        - 16x16
+      processing:
+        define:
+          icon:
+            auto-resize: '64,48,32,24,16'
+      links:
+        - rel: shortcut icon
+        - sizes: auto
+    favicon-512x512.png:
+      links: skip
+      references:
+        webmanifest:
+          icons: auto
+    favicon-192x192.png:
+      links: skip
+      references:
+        webmanifest:
+          icons: auto
+    touch-icon-iphone-6-plus.png:
+      links:
+        skip: root
+        rel: apple-touch-icon
+        sizes: 180x180
+    touch-icon-ipad-pro.png:
+      links:
+        skip: root
+        rel: apple-touch-icon
+        sizes: 167x167
+    touch-icon-ipad-retina.png:
+      links:
+        skip: root
+        rel: apple-touch-icon
+        sizes: 152x152
+    touch-icon-iphone-retina.png:
+      links:
+        skip: root
+        rel: apple-touch-icon
+        sizes: 120x120
+    touch-icon-ipad.png:
+      links:
+        skip: root
+        rel: apple-touch-icon
+        sizes: 76x76
+    touch-icon-iphone.png:
+      links:
+        skip: root
+        rel: apple-touch-icon
+        sizes: 57x57
+    safari-pinned-tab.svg:
+      links:
+        rel: mask-icon
+        color: white
+        sizes: false
+        type: false
+    favicon-16x16.png: {}
+    manifest.webmanifest:
+      path: ''
+      source: manifest.webmanifest
+      metas:
+        - name: application-name
+          content: auto
+    browserconfig.xml:
+      path: ''
+      source: browserconfig.xml
+      metas:
+        - name: msapplication-config
+          content: browserconfig.xml
+      references:
+        browserconfig:
+          msapplication:
+            tile:
+              TileColor: '#ffffff'
+    favicon-558x558.png:
+      links: skip
+      references:
+        browserconfig:
+          msapplication:
+            tile:
+              square310x310logo:
+                _src: favicon-558x558.png
+    favicon-558x270.png:
+      links: skip
+      references:
+        browserconfig:
+          msapplication:
+            tile:
+              wide310x150logo:
+                _src: favicon-558x270.png
+    favicon-270x270.png:
+      links: skip
+      references:
+        browserconfig:
+          msapplication:
+            tile:
+              square150x150logo:
+                _src: favicon-270x270.png
+    favicon-144x144.png:
+      links: skip
+      metas:
+        - name: msapplication-TileColor
+          content: '#ffffff'
+        - name: msapplication-TileImage
+          content: favicon-144x144.png
+    favicon-128x128.png:
+      links: skip
+      references:
+        browserconfig:
+          msapplication:
+            tile:
+              square70x70logo:
+                _src: favicon-128x128.png

@@ -2,21 +2,33 @@ require 'test_helper'
 
 describe Jekyll::Favicon do
   it 'should have a version number' do
-    refute_nil Jekyll::Favicon::VERSION
+    Jekyll::Favicon::VERSION.wont_be_nil
   end
 
-  it 'should have a config paramenter' do
-    refute_empty Jekyll::Favicon.config
-    refute_empty Jekyll::Favicon.config['source']
-    refute_empty Jekyll::Favicon.config['path']
-    refute_empty Jekyll::Favicon.config['generic']
-    refute_empty Jekyll::Favicon.config['generic']['sizes']
-    refute_empty Jekyll::Favicon.config['apple-touch-icon']
-    refute_empty Jekyll::Favicon.config['apple-touch-icon']['background']
-    refute_empty Jekyll::Favicon.config['apple-touch-icon']['sizes']
-    refute_empty Jekyll::Favicon.config['ie']
-    refute_empty Jekyll::Favicon.config['ie']['sizes']
-    refute_empty Jekyll::Favicon.config['chrome']
-    refute_empty Jekyll::Favicon.config['chrome']['sizes']
+  it 'should have a config parameter' do
+    Jekyll::Favicon.config.wont_be_empty
+    Jekyll::Favicon.config['source'].wont_be_empty
+    Jekyll::Favicon.config['path'].wont_be_nil
+    Jekyll::Favicon.config['resources'].wont_be_empty
+  end
+
+  it 'should have a default parameters' do
+    Jekyll::Favicon.defaults['processing'].wont_be_empty
+    Jekyll::Favicon.defaults['processing']['input'].wont_be_empty
+    Jekyll::Favicon.defaults['processing']['input']['.png'].wont_be_empty
+    Jekyll::Favicon.defaults['processing']['input']['.svg'].wont_be_empty
+    Jekyll::Favicon.defaults['processing']['output'].wont_be_empty
+    Jekyll::Favicon.defaults['processing']['output']['.ico'].wont_be_empty
+    Jekyll::Favicon.defaults['processing']['output']['.png'].wont_be_empty
+    Jekyll::Favicon.defaults['processing']['output']['.svg'].wont_be_empty
+    Jekyll::Favicon.defaults['tags'].wont_be_empty
+    Jekyll::Favicon.defaults['tags']['link'].wont_be_empty
+    Jekyll::Favicon.defaults['tags']['meta'].wont_be_empty
+  end
+
+  it 'should have a include' do
+    # Jekyll::Favicon.include().wont_be_empty
+    # Jekyll::Favicon.include()['browserconfig'].wont_be_empty
+    # Jekyll::Favicon.include()['webmanifest'].wont_be_empty
   end
 end
