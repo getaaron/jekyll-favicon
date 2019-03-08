@@ -9,14 +9,19 @@ module Jekyll
 
       def render(context)
         site = context.registers[:site]
-        content = []
-        content << "<!-- Begin Jekyll Favicon tag v#{Favicon::VERSION} -->"
-        content << Favicon.tags(site)
-        content << '<!-- End Jekyll Favicon tag -->'
-        content.flatten.join "\n"
+        tags = Favicon.tags site
+        tags = wrap tags
+        @content = tags.join "\n"
+      end
+
+      private
+
+      def wrap(tags)
+        tags.unshift "<!-- Begin Jekyll Favicon Tag v#{Favicon::VERSION} -->"
+        tags.push '<!-- End Jekyll Favicon Tag -->'
       end
     end
   end
 end
 
-Liquid::Template.register_tag('favicon', Jekyll::Favicon::Tag)
+Liquid::Template.register_tag 'favicon', Jekyll::Favicon::Tag
