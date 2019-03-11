@@ -20,31 +20,6 @@ module Jekyll
 
       private
 
-      def extract_basename_and_sizes_from(basename)
-        basename[/.*-(\d+x\d+).[a-zA-Z]+/, 1] if basename.respond_to? :match
-      end
-
-      def parse_processing_from(custom)
-        processing = {}
-        processing_defaults = Jekyll::Favicon.defaults['processing']
-        processing.merge! update_input_processing processing_defaults
-        processing.merge! update_ouput_processing processing_defaults
-        return unless custom.key?('processing')
-        processing.merge! custom['processing']
-        processing['resize'] = @sizes.join(' ') if @sizes && @name == '.ico'
-        processing
-      end
-
-      def update_input_processing(configs)
-        return {} unless configs['input'].key? source_extname
-        configs['input'][source_extname]
-      end
-
-      def update_ouput_processing(configs)
-        return {} unless configs['output'].key? extname
-        configs['output'][extname]
-      end
-
       def convert(input, output, options = {})
         case File.extname output
         when '.svg' then FileUtils.cp input, output
