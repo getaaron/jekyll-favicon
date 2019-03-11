@@ -6,10 +6,10 @@ module Jekyll
       include Favicon::Referenceable
 
       def initialize(source, site, base, dir, name, custom)
-        sourceabilize source, dir, custom['source'], custom['path']
-        super site, base, @dir, name
+        super site, base, dir, name
         @data = { 'name' => @name, 'layout' => nil }
         custom = {} if custom.nil?
+        sourceabilize source, custom['source'], custom['path']
         referencialize custom['references']
       end
 
@@ -17,8 +17,8 @@ module Jekyll
         File.join(*[@base, source_dir, source_name].compact)
       end
 
-      def type
-        :static_files
+      def modified_time
+        @modified_time ||= File.file?(path) ? File.stat(path).mtime : Time.now
       end
 
       private

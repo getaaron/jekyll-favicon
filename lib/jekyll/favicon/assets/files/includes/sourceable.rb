@@ -8,9 +8,9 @@ module Jekyll
         attr_accessor :source
       end
 
-      def sourceabilize(source, dir, override_source, override_dir)
+      def sourceabilize(source, override_source, override_dir)
         @source = override_source || source
-        @dir = override_dir || dir || ''
+        @dir = override_dir || @dir || ''
       end
 
       def sourceable?

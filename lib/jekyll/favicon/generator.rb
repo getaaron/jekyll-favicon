@@ -7,7 +7,7 @@ module Jekyll
       def generate(site)
         @site = site
         Favicon.assets.each do |asset|
-          @site.send(asset.type).push asset if asset.sourceable?
+          @site.static_files.push asset if asset.sourceable?
         end
       end
     end

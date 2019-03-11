@@ -3,29 +3,26 @@ require 'rexml/document'
 module Jekyll
   module Favicon
     # Build browserconfig XML
-    class Markup < SourcedPage
+    class Markup < SourcedStaticFile
       MAPPINGS = { '.xml' => %w[.xml] }.freeze
 
       def initialize(source, site, base, dir, name, custom = {})
         super source, site, base, dir, name, custom
       end
 
-      def generate
+      def generate(dest_path)
         references = Favicon.references[:browserconfig]
-        document = REXML::Document.new @content
+        raw_source = File.read @source if File.file? @source
+        document = REXML::Document.new raw_source
         deep_populate document, references
-        @content = pretty_generate document
+        content = pretty_generate document
+        File.write dest_path, content
       end
 
       private
 
       def ensure_link?
         false
-      end
-
-      def load_source
-        return unless File.file? @source
-        @content = pretty_generate REXML::Document.new File.read @source
       end
 
       def deep_populate(parent, tree)

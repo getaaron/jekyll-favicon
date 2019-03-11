@@ -11,7 +11,6 @@ module Jekyll
       @defaults = load_defaults
       @assets = generate_assets @config['assets'], @config['source'], site,
                                 @config['path']
-      build_pages_contents @assets
     end
 
     def self.config
@@ -94,11 +93,6 @@ module Jekyll
       end.compact
     end
     private_class_method :generate_assets
-
-    def self.build_pages_contents(assets)
-      assets.each { |asset| asset.generate if asset.is_a? SourcedPage }
-    end
-    private_class_method :build_pages_contents
 
     def self.generate(source, site, base, dir, name, customs)
       generable = case File.extname name
