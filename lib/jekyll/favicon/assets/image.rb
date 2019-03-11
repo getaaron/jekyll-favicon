@@ -1,7 +1,7 @@
 module Jekyll
   module Favicon
     # Image abstraction for icons
-    class Image < SourcedStaticFile
+    class Image < StaticFile
       MAPPINGS = {
         '.png' => %w[.ico .png],
         '.svg' => %w[.ico .png .svg]

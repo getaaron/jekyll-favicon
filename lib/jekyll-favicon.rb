@@ -10,7 +10,7 @@ require_relative 'jekyll/favicon/hooks'
 
 require_relative 'jekyll/favicon/assets/files/includes/referenceable'
 require_relative 'jekyll/favicon/assets/files/includes/sourceable'
-require_relative 'jekyll/favicon/assets/files/sourced_static_file'
+require_relative 'jekyll/favicon/static_file'
 require_relative 'jekyll/favicon/assets/data'
 require_relative 'jekyll/favicon/assets/image'
 require_relative 'jekyll/favicon/assets/markup'

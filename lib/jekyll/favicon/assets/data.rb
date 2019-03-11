@@ -1,7 +1,7 @@
 module Jekyll
   module Favicon
     # Build Webmanifest JSON
-    class Data < SourcedStaticFile
+    class Data < StaticFile
       MAPPINGS = {
         '.json' => %w[.json .webmanifest],
         '.webmanifest' => %w[.json .webmanifest]

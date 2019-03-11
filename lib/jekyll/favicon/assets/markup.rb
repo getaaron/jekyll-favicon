@@ -3,7 +3,7 @@ require 'rexml/document'
 module Jekyll
   module Favicon
     # Build browserconfig XML
-    class Markup < SourcedStaticFile
+    class Markup < StaticFile
       MAPPINGS = { '.xml' => %w[.xml] }.freeze
 
       def initialize(source, site, base, dir, name, custom = {})
