@@ -73,7 +73,12 @@ module Jekyll
 
     def self.consolidate_config(site)
       base = YAML.load_file(CONFIG_PATH.join('base.yml'))['favicon']
-      @config = deep_merge base, (site.config['favicon'] || {})
+      overrides = site.config['favicon'] || {}
+      @config = if overrides['override']
+                  base.merge site.config['favicon']
+                else
+                  deep_merge base, overrides
+                end
     end
     private_class_method :consolidate_config
 

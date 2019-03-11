@@ -1,5 +1,8 @@
 favicon:
   source: custom-source.svg
   path: custom-path
+  override: true
   assets:
-    custom-10x10.png:
+    custom.ico:
+    custom-1x1.png:
+    custom.svg:
