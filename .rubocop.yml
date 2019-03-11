@@ -5,3 +5,5 @@ Metrics/BlockLength:
     - test/**/*.rb
 Style/AndOr:
   EnforcedStyle: conditionals
+Metrics/ParameterLists:
+  Max: 6
