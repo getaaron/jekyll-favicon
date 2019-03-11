@@ -1,7 +1,6 @@
 favicon:
   source: favicon.svg
   path: ''
-  verbose: false
   assets:
     favicon.ico:
       sizes:
