@@ -7,12 +7,11 @@ module Jekyll
     CONFIG_PATH = GEM_ROOT.join 'lib', 'jekyll', 'favicon', 'config'
 
     def self.build(site)
-      @config = nil
-      @defaults = nil
-      @assets = nil
-      consolidate_config site
-      load_defaults
-      build_assets site
+      @config = merge_configs site.config['favicon']
+      @defaults = load_defaults
+      @assets = generate_assets @config['assets'], @config['source'], site,
+                                @config['path']
+      build_pages_contents @assets
     end
 
     def self.config
@@ -28,15 +27,15 @@ module Jekyll
     end
 
     def self.sources
-      assets.reduce(Set[]) { |accum, asset| accum.add asset.source }
+      @assets.reduce(Set[]) { |accum, asset| accum.add asset.source }
     end
 
     def self.references
-      assets.reduce({}) { |accum, asset| deep_merge accum, asset.references }
+      @assets.reduce({}) { |accum, asset| deep_merge accum, asset.references }
     end
 
     def self.tags
-      assets.reduce([]) { |tags, asset| tags + asset.tags }
+      @assets.reduce([]) { |tags, asset| tags + asset.tags }
     end
 
     def self.deep_merge(target, overwrite = {})
@@ -71,36 +70,35 @@ module Jekyll
       end
     end
 
-    def self.consolidate_config(site)
+    def self.merge_configs(overrides)
       base = YAML.load_file(CONFIG_PATH.join('base.yml'))['favicon']
-      overrides = site.config['favicon'] || {}
-      @config = if overrides['override']
-                  base.merge site.config['favicon']
-                else
-                  deep_merge base, overrides
-                end
+      return base unless overrides
+      return base.merge overrides if overrides['override']
+      deep_merge base, overrides
     end
-    private_class_method :consolidate_config
+    private_class_method :merge_configs
 
     def self.load_defaults
-      @defaults = %w[processing tags].reduce({}) do |defaults, type|
+      %w[processing tags].reduce({}) do |defaults, type|
         defaults_path = CONFIG_PATH.join 'defaults', "#{type}.yml"
         defaults.merge YAML.load_file(defaults_path)['favicon']
       end
     end
     private_class_method :load_defaults
 
-    def self.build_assets(site)
-      @assets = config['assets'].collect do |name, customs|
+    def self.generate_assets(assets, source, site, dir)
+      assets.collect do |name, customs|
         next if customs == 'skip'
-        generate config['source'], site, site.source, config['path'], name,
-                 (customs || {})
+        customs ||= {}
+        generate source, site, site.source, dir, name, customs
       end.compact
-      @assets.each do |resource|
-        resource.generate if resource.is_a? SourcedPage
-      end
     end
-    private_class_method :build_assets
+    private_class_method :generate_assets
+
+    def self.build_pages_contents(assets)
+      assets.each { |asset| asset.generate if asset.is_a? SourcedPage }
+    end
+    private_class_method :build_pages_contents
 
     def self.generate(source, site, base, dir, name, customs)
       generable = case File.extname name
