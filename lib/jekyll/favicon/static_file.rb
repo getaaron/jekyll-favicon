@@ -12,20 +12,6 @@ module Jekyll
         sourceabilize source, custom['source'], custom['path']
         referencialize custom['references']
       end
-
-      def path
-        File.join(*[@base, source_dir, source_name].compact)
-      end
-
-      def modified_time
-        @modified_time ||= File.file?(path) ? File.stat(path).mtime : Time.now
-      end
-
-      private
-
-      def copy_file(dest_path)
-        generate dest_path
-      end
     end
   end
 end
