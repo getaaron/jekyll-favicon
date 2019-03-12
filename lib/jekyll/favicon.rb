@@ -34,42 +34,6 @@ module Jekyll
       @assets.reduce({}) { |accum, asset| merge accum, asset.references }
     end
 
-    def self.tags
-      @assets.reduce([]) { |tags, asset| tags + asset.tags }
-    end
-
-    def self.deep_merge(target, overwrite = {})
-      deep_merge!(target.dup, overwrite)
-    end
-
-    def self.deep_merge!(target, overwrite)
-      target.merge! overwrite do |_key, old_val, new_val|
-        which_value? old_val, new_val
-      end
-      if target.is_a?(Hash) && overwrite.is_a?(Hash) && target.default_proc.nil?
-        target.default_proc = overwrite.default_proc
-      end
-      target.each do |key, val|
-        target[key] = val.dup if val.frozen? && duplicable?(val)
-      end
-      target
-    end
-
-    def self.which_value?(*values)
-      if values.last.nil? then values.first
-      elsif values.all? { |value| value.is_a? Array } then values.flatten
-      elsif values.all? { |value| value.is_a? Hash } then deep_merge(*values)
-      else values.last
-      end
-    end
-
-    def self.duplicable?(obj)
-      case obj
-      when nil, false, true, Symbol, Numeric then false
-      else true
-      end
-    end
-
     def self.merge(base, custom, override: false)
       return base unless custom
       return base.merge custom if override

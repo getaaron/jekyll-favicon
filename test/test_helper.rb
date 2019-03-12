@@ -2,7 +2,6 @@ $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'jekyll-favicon'
 require 'minitest/autorun'
 require 'minitest/hooks/default'
-require 'nokogiri'
 
 Jekyll.logger.log_level = :error
 
