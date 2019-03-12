@@ -14,7 +14,7 @@ module Jekyll
       def generate(dest_path)
         input = JSON.parse File.file?(@source) ? File.read(@source) : '{}'
         references = Favicon.references[:webmanifest] || {}
-        content = JSON.pretty_generate Favicon.deep_merge input, references
+        content = JSON.pretty_generate Favicon.merge input, references
         File.write dest_path, content
       end
     end
