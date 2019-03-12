@@ -1,15 +1,16 @@
-require 'yaml'
-
 module Jekyll
-  # Module for custom configurations and defaults
+  # build and provide config, assets and related
   module Favicon
-    GEM_ROOT = Pathname.new File.dirname(File.dirname(__dir__))
+    GEM_ROOT = Pathname.new File.dirname File.dirname __dir__
     CONFIG_PATH = GEM_ROOT.join 'lib', 'jekyll', 'favicon', 'config'
+    BASE = YAML.load_file CONFIG_PATH.join 'base.yml'
+    TAGS = YAML.load_file CONFIG_PATH.join 'defaults', 'tags.yml'
+    PROCESSING = YAML.load_file CONFIG_PATH.join 'defaults', 'processing.yml'
 
-    def self.build(site)
-      @config = merge_configs site.config['favicon']
-      @defaults = load_defaults
-      @assets = generate_assets @config['assets'], @config['source'], site,
+    def self.build(site, custom)
+      @config = merge BASE['favicon'], custom, override: custom['override']
+      @defaults = merge TAGS['favicon'], PROCESSING['favicon']
+      @assets = create_assets @config['assets'], @config['source'], site,
                                 @config['path']
     end
 
@@ -30,7 +31,7 @@ module Jekyll
     end
 
     def self.references
-      @assets.reduce({}) { |accum, asset| deep_merge accum, asset.references }
+      @assets.reduce({}) { |accum, asset| merge accum, asset.references }
     end
 
     def self.tags
@@ -69,30 +70,20 @@ module Jekyll
       end
     end
 
-    def self.merge_configs(overrides)
-      base = YAML.load_file(CONFIG_PATH.join('base.yml'))['favicon']
-      return base unless overrides
-      return base.merge overrides if overrides['override']
-      deep_merge base, overrides
+    def self.merge(base, custom, override: false)
+      return base unless custom
+      return base.merge custom if override
+      deep_merge base, custom
     end
-    private_class_method :merge_configs
 
-    def self.load_defaults
-      %w[processing tags].reduce({}) do |defaults, type|
-        defaults_path = CONFIG_PATH.join 'defaults', "#{type}.yml"
-        defaults.merge YAML.load_file(defaults_path)['favicon']
-      end
-    end
-    private_class_method :load_defaults
-
-    def self.generate_assets(assets, source, site, dir)
+    def self.create_assets(assets, source, site, dir)
       assets.collect do |name, customs|
         next if customs == 'skip'
         customs ||= {}
         generate source, site, site.source, dir, name, customs
       end.compact
     end
-    private_class_method :generate_assets
+    private_class_method :create_assets
 
     def self.generate(source, site, base, dir, name, customs)
       generable = case File.extname name
