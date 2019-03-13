@@ -2,6 +2,33 @@ module Jekyll
   module Favicon
     # provide common functionality methods
     module Utils
+      def self.normalize(attributes, key: nil)
+        case attributes
+        when String then normalize_string attributes, key
+        when Hash then normalize_hash attributes, key
+        when Array then normalize_array attributes, key
+        else [attributes]
+        end.flatten.compact.reject(&:empty?)
+      end
+
+      def self.normalize_string(attributes, key)
+        attributes.empty? ? [] : [{ (key || attributes) => attributes }]
+      end
+
+      def self.normalize_hash(attributes, key)
+        return [attributes] unless key
+        attributes.collect do |attribute_name, attribute_value|
+          { key => attribute_name }.merge case attribute_value
+                                          when Hash then attribute_value
+                                          else { attribute_value => true }
+                                          end
+        end
+      end
+
+      def self.normalize_array(attributes, key)
+        attributes.collect { |attribute| normalize attribute, key: key }
+      end
+
       def self.merge(base, custom, override: false)
         return base unless custom
         return base.merge custom if override

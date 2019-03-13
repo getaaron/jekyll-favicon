@@ -34,10 +34,10 @@ module Jekyll
     end
 
     def self.create_assets(assets, source, site, dir)
-      assets.collect do |name, customs|
-        next if customs == 'skip'
-        customs ||= {}
-        create_asset source, site, site.source, dir, name, customs
+      normalized_assets = Utils.normalize assets, key: 'name'
+      normalized_assets.collect do |asset|
+        next if asset['name'] == 'skip' || asset.key?('skip')
+        create_asset source, site, site.source, dir, asset['name'], asset
       end.compact
     end
     private_class_method :create_assets
