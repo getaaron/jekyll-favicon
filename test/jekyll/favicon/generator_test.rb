@@ -9,46 +9,203 @@ describe 'create files with a generator' do
     FileUtils.remove_entry @options['destination']
   end
 
-  describe 'when a site uses default all default configs' do
+  describe "when a site doesn't have a source file" do
     before :all do
-      @options['source'] = fixture 'sites', 'minimal'
+      @options['source'] = fixture 'sites', 'empty'
       site = Jekyll::Site.new Jekyll.configuration @options
       site.process
     end
 
-    it "should create all resource's names in config" do
-      Jekyll::Favicon.must_respond_to :config
-      Jekyll::Favicon.config.wont_be_nil
-      Jekyll::Favicon.config['assets'].wont_be_nil
-      Jekyll::Favicon.config['assets'].wont_be_empty
+    it "should not create any resource's names in config" do
       Jekyll::Favicon.config['assets'].each do |name, _|
-        assert File.file? File.join @options['destination'], name
+        path = File.join @options['destination'], name
+        File.file?(path).must_equal false
+      end
+    end
+  end
+
+  describe 'when a site uses all default configs' do
+    before :all do
+      @options['source'] = fixture 'sites', 'minimal'
+      @site = Jekyll::Site.new Jekyll.configuration @options
+      @site.process
+    end
+
+    it "creates all assets's names and files in config" do
+      Jekyll::Favicon.config['assets'].each do |name, _|
+        static_files_names = @site.static_files.collect(&:name)
+        static_files_names.must_include name
+        dest_path = File.join @options['destination'], name
+        File.file?(dest_path).must_equal true
       end
     end
 
-    it 'should create valid json webmanifest' do
+    it 'creates a valid json webmanifest' do
       path = File.join @options['destination'], 'manifest.webmanifest'
-      assert File.file? path
+      File.file?(path).must_equal true
       content = JSON.parse File.read path
-      content.wont_be_nil
+      content.must_be_kind_of Hash
       icons = content['icons']
-      icons.wont_be_empty
-      icon = icons.first
-      icon['src'].must_equal '/favicon-512x512.png'
+      icons.must_be_kind_of Array
+      icons_names = icons.collect { |icon| icon['src'] }
+      icons_names.must_include '/favicon-512x512.png'
     end
 
-    it 'should create valid xml browserconfig' do
+    it 'creates a valid xml browserconfig' do
       path = File.join @options['destination'], 'browserconfig.xml'
-      assert File.file? path
+      File.file?(path).must_equal true
       content = REXML::Document.new File.read path
-      content.wont_be_nil
       tiles = content.elements['/browserconfig/msapplication/tile']
-      tiles.wont_be_nil
+      tiles.must_be_kind_of REXML::Element
       tiles.get_elements('square70x70logo').size.must_equal 1
       tile = tiles.elements['square70x70logo']
-      tile.wont_be_nil
+      tile.must_be_kind_of REXML::Element
       tile.attributes['src'].must_equal '/favicon-128x128.png'
       tiles.get_elements('TileColor').size.must_equal 1
+    end
+  end
+
+  describe 'when site uses default PNG favicon' do
+    before :all do
+      @options['source'] = fixture 'sites', 'minimal-png-source'
+      @site = Jekyll::Site.new Jekyll.configuration @options
+      @site.process
+      @config = Jekyll::Favicon.config
+    end
+
+    it 'should create an ICO favicon' do
+      File.file?(File.join(@site.dest, 'favicon.ico')).must_equal true
+    end
+
+    it 'should create an PNG favicons' do
+      png_paths = Dir.glob File.join(@site.dest, '**', '*.png')
+      png_names = png_paths.collect { |path| File.basename path }
+      assets = Jekyll::Favicon.assets @site
+      png_assets = assets.select { |asset| '.png'.eql? asset.extname }
+      png_assets.each do |asset|
+        png_names.must_include asset.name
+      end
+    end
+
+    it 'should create a Webmanifest' do
+      webmanifest_asset = Jekyll::Favicon.assets(@site).find do |asset|
+        'manifest.webmanifest'.eql? asset.name
+      end
+      path = File.join @site.dest, webmanifest_asset.name
+      File.file?(path).must_equal true
+    end
+
+    it 'should create a Browserconfig' do
+      browserconfig_asset = Jekyll::Favicon.assets(@site).find do |asset|
+        'browserconfig.xml'.eql? asset.name
+      end
+      path = File.join @site.dest, browserconfig_asset.name
+      File.file?(path).must_equal true
+    end
+  end
+
+  describe 'when site has an existing webmanifest at default location' do
+    before :all do
+      @options['source'] = fixture 'sites', 'minimal-default-webmanifest'
+      @site = Jekyll::Site.new Jekyll.configuration @options
+      @site.process
+      webmanifest_asset = Jekyll::Favicon.assets(@site).find do |asset|
+        'manifest.webmanifest'.eql? asset.name
+      end
+      path = File.join @options['destination'], webmanifest_asset.name
+      @content = JSON.parse File.read path
+    end
+
+    it 'keeps values from existing webmanifest' do
+      path = File.join @options['source'], 'manifest.webmanifest'
+      existing_content = JSON.parse File.read path
+      existing_content.each do |property, value|
+        @content.must_include property
+        @content[property].must_equal value
+      end
+    end
+
+    it 'appends icons to webmanifest' do
+      @content.must_include 'icons'
+      @content['icons'].wont_be_empty
+      @content['icons'].size.must_equal 2
+    end
+  end
+
+  describe 'when site has an existing custom configuration' do
+    before :all do
+      @options['source'] = fixture 'sites', 'custom-config'
+      @site = Jekyll::Site.new Jekyll.configuration @options
+      @site.process
+      @user_config = YAML.load_file File.join @options['source'], '_config.yml'
+    end
+
+    describe 'when creates a manifest' do
+      before :all do
+        @webmanifest = Jekyll::Favicon.assets(@site).find do |asset|
+          'custom.webmanifest'.eql? asset.name
+        end
+        @webmanifest_path = File.join @options['destination'], 'assets/objects',
+                                      'custom.webmanifest'
+      end
+
+      it 'should exists only one manifest' do
+        File.file?(@webmanifest_path).must_equal true
+        overwritten_path = File.join @options['destination'], 'data/source.json'
+        File.file?(overwritten_path).must_equal false
+      end
+
+      it 'should merge attributes from existent webmanifest' do
+        content = JSON.parse File.read @webmanifest_path
+        original_path = File.join @options['source'], 'data/source.json'
+        existing_content = JSON.parse File.read original_path
+        existing_content.each do |property, value|
+          content.must_include property
+          content[property].must_equal value
+        end
+        content.must_include 'icons'
+      end
+    end
+
+    describe 'when creates a browserconfig' do
+      before :all do
+        @browserconfig = Jekyll::Favicon.assets(@site).find do |asset|
+          'custom.xml'.eql? asset.name
+        end
+        @browserconfig_path = File.join @options['destination'],
+                                        'assets/markup', 'custom.xml'
+      end
+
+      it 'should exists only one browserconfig' do
+        File.file?(@browserconfig_path).must_equal true
+        overwritten_path = File.join @options['destination'], 'data/source.xml'
+        File.file?(overwritten_path).must_equal false
+      end
+
+      it 'should merge and override attributes from existent browserconfig' do
+        content = REXML::Document.new File.read @browserconfig_path
+        original_path = File.join @options['source'], 'data/source.xml'
+        original_content = REXML::Document.new File.read original_path
+        tiles_path = '/browserconfig/msapplication/tile'
+        tiles = content.elements[tiles_path].elements
+        tiles['square70x70logo'].must_be_kind_of REXML::Element
+        tiles['TileColor'].must_be_kind_of REXML::Element
+        path = File.join '', @user_config['favicon']['path'],
+                         'favicon-128x128.png'
+        tiles['square70x70logo'].attributes['src'].must_equal path
+        original_tiles = original_content.elements[tiles_path]
+        original_tiles.each_element_with_attribute('src') do |original_tile|
+          src = tiles[original_tile.name].attributes['src']
+          original_tile.attributes['src'].wont_equal src
+        end
+        notifications_path = '/browserconfig/msapplication/notification'
+        notifications = content.elements[notifications_path].elements
+        original_notifications = original_content.elements[notifications_path]
+        original_notifications.each_element do |original_notification|
+          notification = notifications[original_notification.name]
+          original_notification.inspect.must_equal notification.inspect
+        end
+      end
     end
   end
 end

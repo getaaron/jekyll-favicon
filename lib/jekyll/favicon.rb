@@ -7,37 +7,30 @@ module Jekyll
     TAGS = YAML.load_file CONFIG_PATH.join 'defaults', 'tags.yml'
     PROCESSING = YAML.load_file CONFIG_PATH.join 'defaults', 'processing.yml'
 
-    def self.build(site, custom)
-      @config = merge BASE['favicon'], custom, override: custom['override']
-      @defaults = merge TAGS['favicon'], PROCESSING['favicon']
-      @assets = create_assets @config['assets'], @config['source'], site,
-                              @config['path']
-    end
-
-    def self.config
-      @config
+    def self.config(masks = {})
+      Utils.merge BASE['favicon'], masks, override: masks['override']
     end
 
     def self.defaults
-      @defaults
+      Utils.merge TAGS['favicon'], PROCESSING['favicon']
     end
 
-    def self.assets
-      @assets
+    def self.assets(site)
+      base = config(site.config['favicon'] || {})
+      create_assets base['assets'], base['source'], site, base['path']
     end
 
-    def self.sources
-      @assets.reduce(Set[]) { |accum, asset| accum.add asset.source }
+    def self.sources(site)
+      assets(site).reduce(Set[]) { |sources, asset| sources.add asset.source }
     end
 
-    def self.references
-      @assets.reduce({}) { |accum, asset| merge accum, asset.references }
-    end
-
-    def self.merge(base, custom, override: false)
-      return base unless custom
-      return base.merge custom if override
-      Utils.deeply_merge_hashes_and_arrays base, custom
+    def self.references(site)
+      assets(site).reduce({}) do |references, asset|
+        if asset.generable?
+          Utils.merge references, asset.references
+        else references
+        end
+      end
     end
 
     def self.create_assets(assets, source, site, dir)
@@ -51,9 +44,9 @@ module Jekyll
 
     def self.create_asset(source, site, base, dir, name, customs)
       asset = case File.extname name
-              when *Data::MAPPINGS.values.flatten then Data
-              when *Image::MAPPINGS.values.flatten then Image
-              when *Markup::MAPPINGS.values.flatten then Markup
+              when *Assets::Data::MAPPINGS.values.flatten then Assets::Data
+              when *Assets::Image::MAPPINGS.values.flatten then Assets::Image
+              when *Assets::Markup::MAPPINGS.values.flatten then Assets::Markup
               end
       asset.new source, site, base, dir, name, customs
     end

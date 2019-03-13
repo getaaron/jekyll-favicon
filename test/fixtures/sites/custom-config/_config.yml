@@ -1,0 +1,12 @@
+favicon:
+  source: 'custom-favicon.svg'
+  path: 'custom/path'
+  assets:
+    manifest.webmanifest: skip
+    custom.webmanifest:
+      path: assets/objects
+      source: data/source.json
+    browserconfig.xml: skip
+    custom.xml:
+      path: assets/markup
+      source: data/source.xml

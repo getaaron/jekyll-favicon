@@ -28,42 +28,48 @@ favicon:
         webmanifest:
           icons: auto
     touch-icon-iphone-6-plus.png:
+      sizes: 180x180
       links:
         skip: root
         rel: apple-touch-icon
-        sizes: 180x180
+        sizes: auto
     touch-icon-ipad-pro.png:
+      sizes: 167x167
       links:
         skip: root
         rel: apple-touch-icon
-        sizes: 167x167
+        sizes: auto
     touch-icon-ipad-retina.png:
+      sizes: 152x152
       links:
         skip: root
         rel: apple-touch-icon
-        sizes: 152x152
+        sizes: auto
     touch-icon-iphone-retina.png:
+      sizes: 120x120
       links:
         skip: root
         rel: apple-touch-icon
-        sizes: 120x120
+        sizes: auto
     touch-icon-ipad.png:
+      sizes: 76x76
       links:
         skip: root
         rel: apple-touch-icon
-        sizes: 76x76
+        sizes: auto
     touch-icon-iphone.png:
+      sizes: 57x57
       links:
         skip: root
         rel: apple-touch-icon
-        sizes: 57x57
+        sizes: auto
     safari-pinned-tab.svg:
       links:
         rel: mask-icon
         color: white
         sizes: false
         type: false
-    favicon-16x16.png: {}
+    favicon-16x16.png:
     manifest.webmanifest:
       path: ''
       source: manifest.webmanifest
@@ -76,17 +82,13 @@ favicon:
       metas:
         - name: msapplication-config
           content: browserconfig.xml
-      references:
-        browserconfig:
-          msapplication:
-            tile:
-              TileColor: '#ffffff'
     favicon-558x558.png:
       links: skip
       references:
         browserconfig:
           msapplication:
             tile:
+              TileColor: '#ffffff'
               square310x310logo:
                 _src: favicon-558x558.png
     favicon-558x270.png:

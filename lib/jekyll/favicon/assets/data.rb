@@ -1,21 +1,28 @@
 module Jekyll
   module Favicon
-    # Build Webmanifest JSON
-    class Data < StaticFile
-      MAPPINGS = {
-        '.json' => %w[.json .webmanifest],
-        '.webmanifest' => %w[.json .webmanifest]
-      }.freeze
+    module Assets
+      # Build Webmanifest JSON
+      class Data < StaticFile
+        MAPPINGS = {
+          '.json' => %w[.json .webmanifest],
+          '.webmanifest' => %w[.json .webmanifest]
+        }.freeze
 
-      def initialize(source, site, base, dir, name, custom = {})
-        super source, site, base, dir, name, custom
-      end
+        def initialize(source, site, base, dir, name, custom = {})
+          super source, site, base, dir, name, custom
+        end
 
-      def generate(dest_path)
-        input = JSON.parse File.file?(@source) ? File.read(@source) : '{}'
-        references = Favicon.references[:webmanifest] || {}
-        content = JSON.pretty_generate Favicon.merge input, references
-        File.write dest_path, content
+        def generable?
+          mappeable?
+        end
+
+        def generate(dest_path)
+          current_data = JSON.parse File.read path if File.file? path
+          new_data = Favicon.references(@site)[:webmanifest]
+          return unless current_data || new_data
+          content = Favicon::Utils.merge (current_data || {}), new_data
+          File.write dest_path, JSON.pretty_generate(content)
+        end
       end
     end
   end
