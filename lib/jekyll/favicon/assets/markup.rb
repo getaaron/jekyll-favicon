@@ -2,7 +2,7 @@ module Jekyll
   module Favicon
     module Assets
       # Build browserconfig XML
-      class Markup < StaticFile
+      class Markup < Asset
         MAPPINGS = { '.xml' => %w[.xml] }.freeze
 
         def initialize(source, site, base, dir, name, custom = {})

@@ -1,7 +1,7 @@
 module Jekyll
   module Favicon
     # Extended static file that generates multpiple favicons
-    class StaticFile < Jekyll::StaticFile
+    class Asset < Jekyll::StaticFile
       include Favicon::Assets::Properties::Sourceable
       include Favicon::Assets::Properties::Mappeable
       include Favicon::Assets::Properties::Referenceable

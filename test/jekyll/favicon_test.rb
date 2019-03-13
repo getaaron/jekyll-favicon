@@ -28,7 +28,7 @@ describe Jekyll::Favicon do
                                       @site, @dir
         assets.size.must_equal raw_assets.size
         assets.each do |asset|
-          asset.must_be_kind_of Jekyll::Favicon::StaticFile
+          asset.must_be_kind_of Jekyll::Favicon::Asset
         end
       end
 
@@ -106,7 +106,7 @@ describe Jekyll::Favicon do
       assets.must_be_kind_of Array
       assets.wont_be_empty
       assets.each do |asset|
-        asset.must_be_kind_of Jekyll::Favicon::StaticFile
+        asset.must_be_kind_of Jekyll::Favicon::Asset
       end
     end
   end

@@ -2,7 +2,7 @@ module Jekyll
   module Favicon
     module Assets
       # Build Webmanifest JSON
-      class Data < StaticFile
+      class Data < Asset
         MAPPINGS = {
           '.json' => %w[.json .webmanifest],
           '.webmanifest' => %w[.json .webmanifest]

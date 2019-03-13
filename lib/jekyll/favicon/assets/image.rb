@@ -2,7 +2,7 @@ module Jekyll
   module Favicon
     module Assets
       # Image abstraction for icons
-      class Image < StaticFile
+      class Image < Asset
         include Assets::Properties::Convertible
 
         MAPPINGS = {

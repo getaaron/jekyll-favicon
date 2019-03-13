@@ -11,7 +11,7 @@ end
 
 module Jekyll
   module Favicon
-    class StaticFile < Jekyll::StaticFile
+    class Asset
       def inspect
         "<StaticFile name='#{@name}'>"
       end
