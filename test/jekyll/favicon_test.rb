@@ -1,14 +1,10 @@
 require 'test_helper'
 
 describe Jekyll::Favicon do
-  before :all do
-    @site = Jekyll::Site.new Jekyll.configuration
-    @source = 'valid-source.svg'
-    @base = ''
-    @dir = ''
-    @name = 'invalid-source.txt'
-    @custom = {}
-  end
+  let(:site) { Jekyll::Site.new Jekyll.configuration }
+  let(:basename) { 'filename.svg' }
+  let(:dir) { 'pathname' }
+  let(:config) { {} }
 
   describe '.create_assets' do
     it 'is a private method' do
@@ -17,30 +13,37 @@ describe Jekyll::Favicon do
     end
 
     it 'provides a empty collection if an empty hash is provided' do
-      assets = Jekyll::Favicon.send :create_assets, {}, @source, @site, @dir
+      assets_configs = {}
+      arguments = [assets_configs, basename, site, dir]
+      assets = Jekyll::Favicon.send :create_assets, *arguments
       assets.must_be_kind_of Array
       assets.must_be_empty
     end
 
     it "provides an Jekyll::Favicon::Asset collection if raw_asset's values " \
        'are hashes or nil' do
-      raw_assets = { 'valid.png' => {}, 'valid.ico' => nil }
-      assets = Jekyll::Favicon.send :create_assets, raw_assets, @source,
-                                    @site, @dir
-      assets.size.must_equal raw_assets.size
-      assets.each do |asset|
-        asset.must_be_kind_of Jekyll::Favicon::Asset
-      end
+      assets_configs = {
+        'valid-1x1.png' => nil,
+        'valid-2x2.png' => '',
+        'valid-3x3.png' => 'non-skip-text',
+        'valid-4x4.png' => {},
+        'valid-5x5.png' => { 'key' => 'value' },
+        'valid-6x6.png' => []
+      }
+      arguments = [assets_configs, basename, site, dir]
+      assets = Jekyll::Favicon.send :create_assets, *arguments
+      assets.size.must_equal assets_configs.size
+      assets.each { |asset| asset.must_be_kind_of Jekyll::Favicon::Asset }
     end
 
     it 'skip a raw_asset if its value is the string `skip`' do
-      raw_assets = { 'valid.png' => 'skip' }
-      assets = Jekyll::Favicon.send :create_assets, raw_assets, @source,
-                                    @site, @dir
+      assets_configs = { 'valid.png' => 'skip' }
+      arguments = [assets_configs, basename, site, dir]
+      assets = Jekyll::Favicon.send :create_assets, *arguments
       assets.must_be_empty
-      raw_assets = { 'skip-this.png' => 'skip', 'valid.svg' => {} }
-      assets = Jekyll::Favicon.send :create_assets, raw_assets, @source,
-                                    @site, @dir
+      assets_configs = { 'skip-this.png' => 'skip', 'valid.svg' => {} }
+      arguments = [assets_configs, basename, site, dir]
+      assets = Jekyll::Favicon.send :create_assets, *arguments
       assets.size.must_equal 1
       assets.first.name.must_equal 'valid.svg'
     end
@@ -55,8 +58,8 @@ describe Jekyll::Favicon do
     it 'creates a Jekyll::Favicon::Image asset instance if the name has a ' \
        'valid image extension' do
       %w[.png .ico .svg].each do |extname|
-        asset = Jekyll::Favicon.send :create_asset, @source, @site, @base,
-                                     @dir, @name + extname, @custom
+        arguments = [basename, site, dir, dir, basename + extname, config]
+        asset = Jekyll::Favicon.send :create_asset, *arguments
         asset.must_be_kind_of Jekyll::Favicon::Assets::Image
       end
     end
@@ -64,16 +67,16 @@ describe Jekyll::Favicon do
     it 'creates a Jekyll::Favicon::Data asset instance if the name has a ' \
        'valid Webmanifest extension' do
       %w[.json .webmanifest].each do |extname|
-        asset = Jekyll::Favicon.send :create_asset, @source, @site, @base,
-                                     @dir, @name + extname, @custom
+        arguments = [basename, site, dir, dir, basename + extname, config]
+        asset = Jekyll::Favicon.send :create_asset, *arguments
         asset.must_be_kind_of Jekyll::Favicon::Assets::Data
       end
     end
 
     it 'creates a Jekyll::Favicon::Markup asset instance if the name has a ' \
        'valid Browserconfig extension' do
-      asset = Jekyll::Favicon.send :create_asset, @source, @site, @base,
-                                   @dir, @name + '.xml', @custom
+      arguments = [basename, site, dir, dir, basename + '.xml', config]
+      asset = Jekyll::Favicon.send :create_asset, *arguments
       asset.must_be_kind_of Jekyll::Favicon::Assets::Markup
     end
   end
@@ -112,7 +115,7 @@ describe Jekyll::Favicon do
     end
 
     it "maps config's assets to a collection of Jekyll::Favicon::Asset" do
-      assets = Jekyll::Favicon.assets @site
+      assets = Jekyll::Favicon.assets site
       assets.must_be_kind_of Array
       assets.wont_be_empty
       assets.each do |asset|
@@ -127,7 +130,7 @@ describe Jekyll::Favicon do
     end
 
     it "collects the different source's names through all assets" do
-      sources = Jekyll::Favicon.sources @site
+      sources = Jekyll::Favicon.sources site
       sources.must_be_kind_of Set
       sources.wont_be_empty
     end
@@ -139,7 +142,7 @@ describe Jekyll::Favicon do
     end
 
     it 'collects and unifies all the references through all assets' do
-      references = Jekyll::Favicon.references @site
+      references = Jekyll::Favicon.references site
       references.must_be_kind_of Hash
       references.must_be_empty
     end
