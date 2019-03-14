@@ -1,6 +1,6 @@
 require 'test_helper'
 
-describe 'create files with a generator' do
+describe Jekyll::Favicon::Generator do
   around :all do |&block|
     Dir.mktmpdir do |dir|
       @options = { 'destination' => dir }
