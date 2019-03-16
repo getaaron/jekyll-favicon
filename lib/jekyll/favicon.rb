@@ -16,7 +16,7 @@ module Jekyll
     end
 
     def self.assets(site)
-      base = config(site.config['favicon'] || {})
+      base = config site.config.fetch('favicon', {})
       create_assets base['assets'], base['source'], site, base['path']
     end
 
@@ -36,7 +36,6 @@ module Jekyll
     def self.create_assets(assets, source, site, dir)
       normalized_assets = Utils.normalize assets, key: 'name'
       normalized_assets.collect do |asset|
-        next if asset['name'] == 'skip' || asset.key?('skip')
         create_asset source, site, site.source, dir, asset['name'], asset
       end.compact
     end

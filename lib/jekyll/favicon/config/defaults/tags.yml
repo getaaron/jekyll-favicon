@@ -1,5 +1,8 @@
 favicon:
   tags:
+    keys:
+      link: href
+      meta: content
     defaults: &defaults
       crossorigin: null
       href: null

@@ -4,6 +4,8 @@ module Jekyll
       module Properties
         # Add convert images
         module Convertible
+          DEFAULTS = Jekyll::Favicon.defaults['processing']
+
           def self.included(_mod)
             attr_accessor :sizes, :processing
           end
@@ -17,24 +19,12 @@ module Jekyll
           end
 
           def parse_processing_from(custom)
-            processing = {}
-            processing_defaults = Jekyll::Favicon.defaults['processing']
-            input_processing = update_input_processing processing_defaults
-            processing = Favicon::Utils.merge processing, input_processing
-            output_processing = update_output_processing processing_defaults
-            processing = Favicon::Utils.merge processing, output_processing
-            return processing unless custom
-            processing
-          end
-
-          def update_input_processing(configs)
-            return {} unless configs['input'].key? source_extname
-            configs['input'][source_extname]
-          end
-
-          def update_output_processing(configs)
-            return {} unless configs['output'].key? extname
-            configs['output'][extname]
+            parsed = DEFAULTS.fetch('input', {}).fetch(source_extname, {})
+                             .merge DEFAULTS.fetch('output', {})
+                                            .fetch(extname, {})
+            return parsed unless custom
+            return parsed unless @sizes || !extname.eql?('.ico')
+            parsed.update 'resize' => @sizes.join
           end
 
           def convert(input, output, options = {})

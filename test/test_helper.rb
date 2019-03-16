@@ -13,7 +13,7 @@ module Jekyll
   module Favicon
     class Asset
       def inspect
-        "<StaticFile name='#{@name}'>"
+        "<#{self.class} name='#{@name}'>"
       end
     end
   end

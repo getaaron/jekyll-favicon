@@ -24,7 +24,7 @@ module Jekyll
 
         private
 
-        def ensure_link?
+        def ensure_tag?(_tag_name)
           false
         end
       end

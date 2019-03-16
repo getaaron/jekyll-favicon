@@ -25,13 +25,9 @@ module Jekyll
 
           def parse_icons(references)
             return if references.nil? || !references.key?('icons')
-            {
-              'icons' => [{
-                'src' => File.join(*['', @dir, @name].compact),
-                'type' => extname[1..-1],
-                'sizes' => @sizes.join(' ')
-              }]
-            }
+            icon = { 'src' => relative_url, 'type' => extname[1..-1] }
+            icon['sizes'] = @sizes.join ' ' if @sizes
+            { 'icons' => [icon] }
           end
 
           def parse_tiles(references)
@@ -39,7 +35,7 @@ module Jekyll
             if (tiles = references['msapplication']['tile'])
               tiles.each do |name, _|
                 next unless tiles[name]['_src']
-                tiles[name]['_src'] = File.join(*['', @dir, @name].compact)
+                tiles[name]['_src'] = relative_url
               end
             end
             { 'browserconfig' => references }
