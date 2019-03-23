@@ -1,3 +1,5 @@
+require 'liquid'
+
 module Jekyll
   module Favicon
     # `favicon` tag for favicon include on templates
@@ -6,7 +8,7 @@ module Jekyll
         site = context.registers[:site]
         site.static_files.collect do |static_file|
           static_file.tags if static_file.is_a? Favicon::Asset
-        end.flatten.compact
+        end.flatten.compact.join "\n"
       end
     end
   end

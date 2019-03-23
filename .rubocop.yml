@@ -3,7 +3,8 @@ Metrics/BlockLength:
     - Rakefile
     - '**/*.rake'
     - test/**/*.rb
+Naming/FileName:
+  Exclude:
+    - lib/jekyll-favicon.rb
 Style/AndOr:
   EnforcedStyle: conditionals
-Metrics/ParameterLists:
-  Max: 6

@@ -1,53 +1,44 @@
+require 'yaml'
+
 module Jekyll
   # build and provide config, assets and related
   module Favicon
-    GEM_ROOT = Pathname.new File.dirname File.dirname __dir__
-    CONFIG_PATH = GEM_ROOT.join 'lib', 'jekyll', 'favicon', 'config'
-    BASE = YAML.load_file CONFIG_PATH.join 'base.yml'
-    TAGS = YAML.load_file CONFIG_PATH.join 'defaults', 'tags.yml'
-    PROCESSING = YAML.load_file CONFIG_PATH.join 'defaults', 'processing.yml'
-
-    def self.config(masks = {})
-      Utils.merge BASE['favicon'], masks, override: masks['override']
-    end
-
-    def self.defaults
-      Utils.merge TAGS['favicon'], PROCESSING['favicon']
-    end
+    config_path = Pathname.new File.join(__dir__, 'favicon', 'config')
+    DEFAULT_GLOBAL_ATTRIBUTES = YAML.load_file config_path.join 'global.yml'
+    DEFAULT_ASSETS = YAML.load_file config_path.join 'assets.yml'
 
     def self.assets(site)
-      base = config site.config.fetch('favicon', {})
-      create_assets base['assets'], base['source'], site, base['path']
+      user_config = site.config.fetch 'favicon', {}
+      user_global_attributes = user_config.select do |attribute, _|
+        DEFAULT_GLOBAL_ATTRIBUTES.key? attribute
+      end
+      global_attributes = DEFAULT_GLOBAL_ATTRIBUTES.merge user_global_attributes
+      user_assets = user_config.fetch('assets', {}) || {}
+      assets_customizations = if user_config['override'] then user_assets
+                              else Utils.merge DEFAULT_ASSETS, user_assets
+                              end
+      create_assets site, assets_customizations, global_attributes
     end
 
     def self.sources(site)
       assets(site).reduce(Set[]) { |sources, asset| sources.add asset.source }
     end
 
-    def self.references(site)
-      assets(site).reduce({}) do |references, asset|
-        if asset.generable?
-          Utils.merge references, asset.references
-        else references
-        end
-      end
-    end
-
-    def self.create_assets(assets, source, site, dir)
-      normalized_assets = Utils.normalize assets, key: 'name'
-      normalized_assets.collect do |asset|
-        create_asset source, site, site.source, dir, asset['name'], asset
-      end.compact
+    def self.create_assets(site, config, base_values = {})
+      items = Config.transform config, key: 'name', base_values: base_values
+      items.collect { |item| create_asset site, item }.compact
     end
     private_class_method :create_assets
 
-    def self.create_asset(source, site, base, dir, name, customs)
-      asset = case File.extname name
-              when *Assets::Data::MAPPINGS.values.flatten then Assets::Data
-              when *Assets::Image::MAPPINGS.values.flatten then Assets::Image
-              when *Assets::Markup::MAPPINGS.values.flatten then Assets::Markup
+    def self.create_asset(site, attributes)
+      return if attributes['skip']
+      asset = case File.extname attributes['name']
+              when *Data::MAPPINGS.values.flatten then Data
+              when *Image::MAPPINGS.values.flatten then Image
+              when *Markup::MAPPINGS.values.flatten then Markup
+              else return nil
               end
-      asset.new source, site, base, dir, name, customs
+      asset.new site, attributes
     end
     private_class_method :create_asset
   end

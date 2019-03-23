@@ -1,3 +1,6 @@
+require 'jekyll/plugin'
+require 'jekyll/generator'
+
 module Jekyll
   module Favicon
     # Extended generator that creates all the icons and data files

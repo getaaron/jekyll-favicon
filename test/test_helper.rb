@@ -3,6 +3,7 @@ require 'jekyll-favicon'
 require 'minitest/autorun'
 require 'minitest/hooks/default'
 
+require 'jekyll'
 Jekyll.logger.log_level = :error
 
 def fixture(*subdirs)

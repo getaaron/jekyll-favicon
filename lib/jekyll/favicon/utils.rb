@@ -2,41 +2,6 @@ module Jekyll
   module Favicon
     # provide common functionality methods
     module Utils
-      def self.normalize(attributes, key: nil, defaults: {}, overrides: {},
-                         ensure_value: false)
-        case attributes
-        when String then normalize_string attributes, key, defaults, overrides
-        when Hash then normalize_hash attributes, key, defaults, overrides
-        when Array then normalize_array attributes, key, defaults, overrides
-        when NilClass then ensure_value ? [defaults.merge(overrides)] : []
-        end.flatten.compact.reject(&:empty?)
-      end
-
-      def self.normalize_string(attributes, key, defaults, overrides)
-        return [] if attributes.empty?
-        [defaults.merge((key || attributes) => attributes).merge(overrides)]
-      end
-
-      def self.normalize_hash(attributes, key, defaults, overrides)
-        return [defaults.merge(attributes).merge(overrides)] unless key
-        attributes.collect do |attribute_name, attribute_value|
-          next if 'skip'.eql? attribute_value
-          defaults.merge(key => attribute_name)
-                  .merge case attribute_value
-                         when Hash then attribute_value
-                         else {}
-                         end
-            .merge overrides
-        end
-      end
-
-      def self.normalize_array(attributes, key, defaults, overrides)
-        attributes.collect do |attribute|
-          normalize attribute, key: key, defaults: defaults,
-                               overrides: overrides
-        end
-      end
-
       def self.merge(base, custom, override: false)
         return base unless custom
         return base.merge custom if override

@@ -1,28 +1,28 @@
 module Jekyll
   module Favicon
-    module Assets
-      # Image abstraction for icons
-      class Image < Asset
-        include Assets::Properties::Convertible
+    # Image abstraction for icons
+    class Image < Asset
+      include Convertible
 
-        MAPPINGS = {
-          '.png' => %w[.ico .png],
-          '.svg' => %w[.ico .png .svg]
-        }.freeze
+      MAPPINGS = {
+        '.png' => %w[.ico .png],
+        '.svg' => %w[.ico .png .svg]
+      }.freeze
 
-        def initialize(source, site, base, dir, name, custom = {})
-          @sizes = [custom['sizes'] || extract_sizes(name)].compact.flatten
-          super source, site, base, dir, name, custom
-          @processing = parse_processing_from custom['processing']
-        end
+      def initialize(site, attributes)
+        super site, attributes
+        convertialize sizes: attributes['sizes'],
+                      name: attributes['name'],
+                      background: attributes['background'],
+                      raw_convert: attributes['convert']
+      end
 
-        def generable?
-          sourceable? && mappeable? && convertible?
-        end
+      def generable?
+        sourceable? && mappeable? && convertible?
+      end
 
-        def generate(dest_path)
-          convert path, dest_path, @processing
-        end
+      def generate(dest_path)
+        convert path, dest_path, convert_options
       end
     end
   end

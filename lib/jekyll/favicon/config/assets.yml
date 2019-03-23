@@ -1,0 +1,103 @@
+chrome-icon-512x512.png:
+  link: skip
+  webmanifest:
+    icons: auto
+chrome-icon-192x192.png:
+  link: skip
+  webmanifest:
+    icons: auto
+apple-touch-icon-180x180.png:
+  link:
+    skip: root
+    rel: apple-touch-icon
+    sizes: auto
+apple-touch-icon-167x167.png:
+  link:
+    skip: root
+    rel: apple-touch-icon
+    sizes: auto
+apple-touch-icon-152x152.png:
+  link:
+    skip: root
+    rel: apple-touch-icon
+    sizes: auto
+apple-touch-icon-120x120.png:
+  link:
+    skip: root
+    rel: apple-touch-icon
+    sizes: auto
+apple-touch-icon-76x76.png:
+  link:
+    skip: root
+    rel: apple-touch-icon
+    sizes: auto
+apple-touch-icon.png:
+  sizes: 57x57
+  link:
+    skip: root
+    rel: apple-touch-icon
+    sizes: auto
+safari-pinned-tab.svg:
+  link:
+    rel: mask-icon
+    color: white
+    sizes: null
+    type: null
+mstile-558x558.png:
+  link: skip
+  browserconfig:
+    msapplication:
+      tile:
+        TileColor: '#ffffff'
+        square310x310logo:
+          _src: mstile-558x558.png
+mstile-558x270.png:
+  link: skip
+  browserconfig:
+    msapplication:
+      tile:
+        wide310x150logo:
+          _src: mstile-558x270.png
+mstile-270x270.png:
+  link: skip
+  browserconfig:
+    msapplication:
+      tile:
+        square150x150logo:
+          _src: mstile-270x270.png
+mstile-144x144.png:
+  link: skip
+  meta:
+    - name: msapplication-TileColor
+      content: '#ffffff'
+    - name: msapplication-TileImage
+      content: mstile-144x144.png
+mstile-128x128.png:
+  link: skip
+  browserconfig:
+    msapplication:
+      tile:
+        square70x70logo:
+          _src: mstile-128x128.png
+favicon-32x32.png:
+favicon.ico:
+  sizes: [64x64, 48x48, 32x32, 24x24, 16x16]
+  convert:
+    define:
+      icon:
+        auto-resize: '64,48,32,24,16'
+  link:
+    - rel: shortcut icon
+    - sizes: auto
+manifest.webmanifest:
+  path: ''
+  source: manifest.webmanifest
+  meta:
+    - name: application-name
+      content: auto
+browserconfig.xml:
+  path: ''
+  source: browserconfig.xml
+  meta:
+    - name: msapplication-config
+      content: browserconfig.xml

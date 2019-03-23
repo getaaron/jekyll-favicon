@@ -1,18 +1,19 @@
+require 'jekyll/static_file'
+
 module Jekyll
   module Favicon
     # Extended static file that generates multpiple favicons
     class Asset < Jekyll::StaticFile
-      include Favicon::Assets::Properties::Sourceable
-      include Favicon::Assets::Properties::Mappeable
-      include Favicon::Assets::Properties::Referenceable
-      include Favicon::Assets::Properties::Taggable
+      include Sourceable
+      include Mappeable
+      include Referenceable
+      include Taggable
 
-      def initialize(source, site, base, dir, name, custom)
-        super site, base, dir, name
-        custom ||= {}
-        sourceabilize source, custom['source'], custom['path']
-        referencialize custom['references']
-        taggabilize 'link' => custom['links'], 'meta' => custom['metas']
+      def initialize(site, attributes)
+        super site, site.source, attributes['dir'], attributes['name']
+        sourceabilize attributes['source']
+        referencialize attributes['webmanifest'], attributes['browserconfig']
+        taggabilize attributes['link'], attributes['meta']
       end
     end
   end
