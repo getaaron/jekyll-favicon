@@ -1,9 +1,6 @@
 key:
-  links: href
-  metas: content
-name:
-  links: link
-  metas: meta
+  link: href
+  meta: content
 defaults: &defaults
   crossorigin: null
   href: null
@@ -12,7 +9,7 @@ defaults: &defaults
   rel: null
   sizes: null
   type: null
-links:
+link:
   .ico:
     <<: *defaults
     rel: icon
@@ -32,7 +29,7 @@ links:
     rel: manifest
   .json:
     <<: *manifest
-metas:
+meta:
   charset: null
   content: null
   http-equiv: null

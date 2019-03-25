@@ -2,13 +2,14 @@ require 'liquid'
 
 module Jekyll
   module Favicon
-    # `favicon` tag for favicon include on templates
+    # `favicon` tag render site's assets tags
     class Tag < Liquid::Tag
       def render(context)
         site = context.registers[:site]
-        site.static_files.collect do |static_file|
-          static_file.tags if static_file.is_a? Favicon::Asset
-        end.flatten.compact.join "\n"
+        static_files = site.static_files
+        assets = static_files.select { |file| file.is_a? Favicon::Asset }
+        tags = assets.collect(&:tags).flatten
+        tags.join "\n"
       end
     end
   end

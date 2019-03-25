@@ -7,47 +7,18 @@ module Jekyll
       DEFAULTS = YAML.load_file File.join(__dir__, 'defaults', 'convert.yml')
 
       def self.included(_mod)
-        attr_accessor :sizes, :raw_convert, :convert_global_options
+        attr_accessor :sizes, :convert_user_options, :convert_global_options
       end
 
-      def convertialize(sizes:, name:, background:, raw_convert:)
-        @sizes = [sizes || extract_sizes(name)].compact.flatten
+      def convertialize(sizes:, name:, background:, convert_user_options:)
+        @sizes = [sizes || extract_sizes_from(name)].compact.flatten
         @convert_global_options = {}
         @convert_global_options['background'] = background if background
-        @raw_convert = raw_convert || {}
+        @convert_user_options = convert_user_options || {}
       end
 
       def convertible?
         @sizes && !@sizes.empty? || '.svg'.eql?(extname)
-      end
-
-      def extract_sizes(name)
-        name[/.*-(\d+x\d+).[a-zA-Z]+/, 1] if name.respond_to? :match
-      end
-
-      def convert_options
-        convert_input_options.merge(convert_output_options)
-                             .merge(convert_global_options)
-                             .merge(@raw_convert)
-                             .merge(convert_extra_options)
-                             .select { |_, value| value }
-      end
-
-      def convert_extra_options
-        return {} if @sizes.empty? || extname.eql?('.ico')
-        { 'resize' => @sizes.join(' ') }
-      end
-
-      def convert_input_options
-        DEFAULTS.fetch('input', {})
-                .fetch(source_extname, {})
-                .select { |_, value| value }
-      end
-
-      def convert_output_options
-        DEFAULTS.fetch('output', {})
-                .fetch(extname, {})
-                .select { |_, value| value }
       end
 
       def convert(input, output, options = {})
@@ -55,6 +26,24 @@ module Jekyll
         when '.svg' then FileUtils.cp input, output
         when '.ico', '.png' then copy input, output, options
         end
+      end
+
+      def convert_options
+        convert_input_options.merge(convert_output_options)
+                             .merge(@convert_global_options)
+                             .merge(@convert_user_options)
+                             .merge(convert_extra_options)
+                             .select { |_, value| value }
+      end
+
+      def joint_sizes(separator = ' ')
+        @sizes.join separator if @sizes
+      end
+
+      private
+
+      def extract_sizes_from(name)
+        name[/.*-(\d+x\d+).[a-zA-Z]+/, 1] if name.respond_to? :match
       end
 
       def copy(input, output, options)
@@ -97,6 +86,23 @@ module Jekyll
         return if weight == height
         yield :gravity, options['gravity']
         yield :extent, options['resize']
+      end
+
+      def convert_input_options
+        DEFAULTS.fetch('input', {})
+                .fetch(source_extname, {})
+                .select { |_, value| value }
+      end
+
+      def convert_output_options
+        DEFAULTS.fetch('output', {})
+                .fetch(extname, {})
+                .select { |_, value| value }
+      end
+
+      def convert_extra_options
+        return {} if @sizes.empty? || extname.eql?('.ico')
+        { 'resize' => joint_sizes }
       end
     end
   end

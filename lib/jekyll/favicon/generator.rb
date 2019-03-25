@@ -3,13 +3,14 @@ require 'jekyll/generator'
 
 module Jekyll
   module Favicon
-    # Extended generator that creates all the icons and data files
+    # Favicon generator that creates image, data and markup static files
     class Generator < Jekyll::Generator
       priority :high
 
       def generate(site)
         @site = site
-        Favicon.assets(@site).each do |asset|
+        assets = Favicon.assets(@site)
+        assets.each do |asset|
           @site.static_files.push asset if asset.generable?
         end
       end

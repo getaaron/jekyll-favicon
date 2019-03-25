@@ -1,7 +1,9 @@
 module Jekyll
   module Favicon
-    # Add source reference to page or static file
+    # Add source reference to a static file
     module Sourceable
+      include Mappeable
+
       def self.included(_mod)
         attr_accessor :source
       end
@@ -24,6 +26,10 @@ module Jekyll
 
       def source_name
         File.basename @source
+      end
+
+      def source_data
+        File.read path if File.file? path
       end
 
       def path

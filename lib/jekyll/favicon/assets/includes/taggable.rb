@@ -7,36 +7,41 @@ module Jekyll
       DEFAULTS = YAML.load_file File.join(__dir__, 'defaults', 'tags.yml')
 
       def self.included(_mod)
-        attr_accessor :raw_links, :raw_metas
+        attr_accessor :raw_link, :raw_meta
       end
 
-      def taggabilize(links, metas)
-        @raw_links = links
-        @raw_metas = metas
+      def taggabilize(link, meta)
+        @raw_link = link
+        @raw_meta = meta
       end
 
-      def grouped_tags
-        output = {}
-        output['links'] = @raw_links if @raw_links
-        output['metas'] = @raw_metas if @raw_metas
-        output
+      def taggable?
+        true
       end
 
       def tags
-        grouped_tags.collect do |tag_type, raw_tags|
+        grouped_tags.collect do |tag_name, raw_tags|
           next if 'skip'.eql? raw_tags
-          transformed = transform_raw_tags tag_type, raw_tags
-          tag_name = DEFAULTS['name'][tag_type]
-          key_attribute = DEFAULTS['key'][tag_type]
+          transformed = transform_raw_tags tag_name, raw_tags
+          key_attribute = DEFAULTS['key'][tag_name]
           create_tags tag_name, key_attribute, transformed
         end.compact.flatten
       end
 
-      def transform_raw_tags(tag_type, raw_tags)
-        defaults = DEFAULTS.fetch(tag_type, {})
-                           .fetch(extname, DEFAULTS[tag_type])
+      private
+
+      def grouped_tags
+        output = {}
+        output['link'] = @raw_link if @raw_link
+        output['meta'] = @raw_meta if @raw_meta
+        output
+      end
+
+      def transform_raw_tags(tag_name, raw_tags)
+        defaults = DEFAULTS.fetch(tag_name, {})
+                           .fetch(extname, DEFAULTS[tag_name])
         Config.transform raw_tags, base_values: defaults,
-                                   ensure_one: ensure_tag?(tag_type)
+                                   ensure_one: ensure_tag?(tag_name)
       end
 
       def create_tags(tag_name, key_attribute, customs)
@@ -46,9 +51,15 @@ module Jekyll
         end.compact
       end
 
+      def create_tag(name, attributes)
+        element = REXML::Element.new name
+        element.add_attributes attributes
+        element
+      end
+
       def patch_raw_tag(key, raw_tag)
         raw_tag.delete 'sizes' unless raw_tag['sizes']
-        raw_tag['sizes'] = @sizes.join(' ') if resize? raw_tag['sizes']
+        raw_tag['sizes'] = joint_sizes if resize? raw_tag['sizes']
         raw_tag[key] = relative_url if rename? raw_tag[key]
         raw_tag
       end
@@ -65,16 +76,6 @@ module Jekyll
         'skip'.eql?(skip) || ('root'.eql?(skip) && '/'.eql?(relative_path))
       end
 
-      def create_tag(name, attributes)
-        element = REXML::Element.new name
-        element.add_attributes attributes
-        element
-      end
-
-      def taggable?
-        true
-      end
-
       def relative_path
         File.dirname relative_url
       end
@@ -83,10 +84,8 @@ module Jekyll
         File.join(*[(@site.baseurl || ''), @dir, @name].compact)
       end
 
-      private
-
       def ensure_tag?(tag_name)
-        ['links'].include?(tag_name)
+        ['link'].include?(tag_name)
       end
     end
   end

@@ -14,7 +14,7 @@ module Jekyll
         convertialize sizes: attributes['sizes'],
                       name: attributes['name'],
                       background: attributes['background'],
-                      raw_convert: attributes['convert']
+                      convert_user_options: attributes['convert']
       end
 
       def generable?
@@ -23,6 +23,14 @@ module Jekyll
 
       def generate(dest_path)
         convert path, dest_path, convert_options
+      end
+
+      def mime_type
+        case extname
+        when '.ico' then 'image/x-icon'
+        when '.png' then 'image/png'
+        when '.svg' then 'image/svg+xml'
+        end
       end
     end
   end

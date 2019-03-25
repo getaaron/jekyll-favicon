@@ -2,6 +2,8 @@ module Jekyll
   module Favicon
     # Build browserconfig XML
     class Markup < Asset
+      include Complementable
+
       MAPPINGS = { '.xml' => %w[.xml] }.freeze
 
       def initialize(site, attributes)
@@ -13,11 +15,10 @@ module Jekyll
       end
 
       def generate(dest_path)
-        current_markup = File.read path if File.file? path
-        new_markup = collect_references :browserconfig
-        return unless current_markup || new_markup
-        document = REXML::Document.new current_markup
-        Favicon::Utils.deep_populate document, new_markup
+        site_markup = site_references :markup
+        return unless source_data || site_markup
+        document = REXML::Document.new source_data
+        Favicon::Utils.deep_populate document, site_markup
         File.write dest_path, Favicon::Utils.pretty_generate(document)
       end
 

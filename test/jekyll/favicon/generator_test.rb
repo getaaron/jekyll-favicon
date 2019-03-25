@@ -5,10 +5,6 @@ describe Jekyll::Favicon::Generator do
     around :all do |&block|
       Dir.mktmpdir do |tmpdir|
         @destination = tmpdir
-        # p 'AROUND ALL'
-        # p options
-        # p site.config['favicon']
-        # p assets.collect(&:relative_url)
         site.process
         super(&block)
       end
